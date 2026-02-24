@@ -9,6 +9,10 @@ import sys
 import subprocess
 from pathlib import Path
 
+# Force UTF-8 encoding for all child processes (Windows cp1252 can't handle emojis)
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+os.environ['PYTHONUTF8'] = '1'
+
 
 def get_venv_python():
     """Get the virtual environment Python executable"""
@@ -31,16 +35,16 @@ def ensure_venv():
 
     # Check if venv exists
     if not venv_dir.exists():
-        print("🔧 First-time setup: Creating virtual environment...")
+        print("[setup] First-time setup: Creating virtual environment...")
         print("   This may take a minute...")
 
         # Run setup with system Python
         result = subprocess.run([sys.executable, str(setup_script)])
         if result.returncode != 0:
-            print("❌ Failed to set up environment")
+            print("[error] Failed to set up environment")
             sys.exit(1)
 
-        print("✅ Environment ready!")
+        print("[ok] Environment ready!")
 
     return get_venv_python()
 
@@ -74,7 +78,7 @@ def main():
     script_path = skill_dir / "scripts" / script_name
 
     if not script_path.exists():
-        print(f"❌ Script not found: {script_name}")
+        print(f"[error] Script not found: {script_name}")
         print(f"   Working directory: {Path.cwd()}")
         print(f"   Skill directory: {skill_dir}")
         print(f"   Looked for: {script_path}")
@@ -91,10 +95,10 @@ def main():
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
     except KeyboardInterrupt:
-        print("\n⚠️ Interrupted by user")
+        print("\n[warn] Interrupted by user")
         sys.exit(130)
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[error] Error: {e}")
         sys.exit(1)
 
 
